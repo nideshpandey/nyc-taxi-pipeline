@@ -5,5 +5,5 @@ nyc_taxi:
   outputs:
     dev:
       type: duckdb
-      path: ../../data/warehouse/nyc_taxi.duckdb
+      path: ../../Desktop/nyc-taxi-pipeline/data/warehouse/nyc_taxi.duckdb
       threads: 4
