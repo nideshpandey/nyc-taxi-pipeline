@@ -1,0 +1,4 @@
+# Airflow lives in its OWN virtual environment — it pins many
+# dependencies and will conflict with the main project env.
+# See INSTRUCTIONS.md section 9 for setup.
+apache-airflow>=2.9

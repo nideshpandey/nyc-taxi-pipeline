@@ -1,0 +1,9 @@
+# Keep this file next to dbt_project.yml and run dbt with:
+#   dbt run --profiles-dir .
+nyc_taxi:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../data/warehouse/nyc_taxi.duckdb
+      threads: 4

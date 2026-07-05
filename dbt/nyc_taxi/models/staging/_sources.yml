@@ -1,0 +1,14 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Landing zone populated by ingestion/load.py. Raw TLC parquet data,
+      untouched except for the added source_file lineage column.
+    schema: raw
+    tables:
+      - name: yellow_trips
+        description: >
+          Yellow taxi trip records as published by the NYC TLC, one row
+          per trip, appended monthly. Column names and types are the
+          TLC originals; cleaning happens in staging, never here.

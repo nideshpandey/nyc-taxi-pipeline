@@ -1,0 +1,7 @@
+duckdb>=1.0
+dbt-core>=1.8
+dbt-duckdb>=1.8
+requests
+streamlit>=1.36
+pandas
+altair

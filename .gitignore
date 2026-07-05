@@ -1,0 +1,9 @@
+data/raw/*.parquet
+data/warehouse/*.duckdb
+.venv/
+dbt/nyc_taxi/target/
+dbt/nyc_taxi/dbt_packages/
+__pycache__/
+.venv-airflow/
+.airflow/
+.DS_Store

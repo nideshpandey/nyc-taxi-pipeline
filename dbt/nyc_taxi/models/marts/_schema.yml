@@ -1,0 +1,55 @@
+version: 2
+
+models:
+  - name: fct_trip_summary
+    description: >
+      Filterable summary cube backing the dashboard. One row per
+      (pickup_date, hour_of_day, day_of_week, pickup_borough,
+      payment_type). Stores SUMS and COUNTS — never averages — so the
+      dashboard can recompute correctly weighted averages after
+      filtering. Incremental: last 7 days rebuilt each run.
+    columns:
+      - name: pickup_date
+        description: Calendar day of pickup (grain component).
+        tests: [not_null]
+      - name: hour_of_day
+        description: Hour 0-23 of pickup (grain component).
+      - name: day_of_week
+        description: Weekday of pickup, 0 = Sunday (grain component).
+      - name: pickup_borough
+        description: Borough of pickup zone via taxi_zone_lookup; 'Unknown' if unmatched.
+      - name: payment_type
+        description: Human-readable payment label decoded from the TLC code.
+        tests:
+          - accepted_values:
+              values: ["Credit card", "Cash", "No charge", "Dispute", "Other"]
+      - name: trips
+        description: Number of trips in this group.
+      - name: revenue
+        description: Sum of total_amount.
+      - name: fare_sum
+        description: Sum of fare_amount (denominator for tip %).
+      - name: tip_sum
+        description: Sum of tip_amount (numerator for tip %).
+      - name: distance_sum
+        description: Sum of trip_distance (for avg distance).
+      - name: duration_sum
+        description: Sum of duration_min (for avg duration).
+
+  - name: fct_zone_metrics
+    description: >
+      Zone-level mart at (pickup_date, borough, zone) grain. Backs the
+      top-pickup-zones chart; filterable by date range and borough.
+      Fully rebuilt each run (small output).
+    columns:
+      - name: pickup_date
+        description: Calendar day of pickup.
+        tests: [not_null]
+      - name: borough
+        description: Borough name from the zone crosswalk.
+      - name: zone
+        description: Neighborhood-level TLC zone name.
+      - name: pickups
+        description: Trip count for this zone-day.
+      - name: revenue
+        description: Sum of total_amount for this zone-day.

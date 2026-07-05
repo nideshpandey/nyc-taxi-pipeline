@@ -1,0 +1,16 @@
+version: 2
+
+seeds:
+  - name: taxi_zone_lookup
+    description: >
+      TLC crosswalk mapping the 265 numeric zone IDs used in trip records
+      to human-readable Borough and Zone (neighborhood) names. Classic
+      dimension table; joined in both marts. Source: TLC website.
+    columns:
+      - name: LocationID
+        description: Numeric zone ID referenced by pickup/dropoff columns.
+        tests: [not_null, unique]
+      - name: Borough
+        description: NYC borough (Manhattan, Queens, ...) or EWR.
+      - name: Zone
+        description: Neighborhood-level zone name.

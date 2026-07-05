@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg_yellow_trips
+    description: >
+      Cleaned trip-level data. Renames TLC columns, casts types, derives
+      trip_id / pickup_date / duration_min, and filters invalid rows
+      (dropoff before pickup, distance <=0 or >=200 mi, total <=0 or
+      >=$1000, passenger_count outside 1-8). Incremental on source_file.
+      All marts read from this model, never from raw.
+    columns:
+      - name: trip_id
+        description: Surrogate key — md5 hash of file, timestamps, zones and total.
+        tests: [not_null, unique]
+      - name: source_file
+        description: Raw parquet file this row came from (lineage / reload key).
+      - name: pickup_at
+        description: Trip start timestamp (was tpep_pickup_datetime).
+        tests: [not_null]
+      - name: dropoff_at
+        description: Trip end timestamp (was tpep_dropoff_datetime).
+      - name: pickup_date
+        description: pickup_at truncated to day; partition key for marts.
+      - name: pickup_zone_id
+        description: TLC zone ID of pickup (join to taxi_zone_lookup).
+      - name: dropoff_zone_id
+        description: TLC zone ID of dropoff.
+      - name: passenger_count
+        description: Passengers reported by the driver (kept 1-8).
+      - name: trip_distance
+        description: Trip distance in miles as reported by the meter.
+      - name: payment_type_id
+        description: TLC payment code (1=credit, 2=cash, ...).
+        tests:
+          - accepted_values:
+              values: [0, 1, 2, 3, 4, 5, 6]
+      - name: fare_amount
+        description: Metered fare, excluding tips/tolls/surcharges.
+      - name: tip_amount
+        description: Tip — card tips only; cash tips are not recorded.
+      - name: tolls_amount
+        description: Total tolls paid.
+      - name: total_amount
+        description: Total charged to the passenger.
+        tests: [not_null]
+      - name: duration_min
+        description: Derived trip duration in minutes.
