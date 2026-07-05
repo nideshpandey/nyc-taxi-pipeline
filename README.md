@@ -88,6 +88,20 @@ Trips are excluded when: dropoff ≤ pickup, distance ≤ 0 or ≥ 200 mi,
 total_amount ≤ 0 or ≥ $1,000, passenger_count outside 1–8. Rules are
 documented in `stg_yellow_trips.sql`.
 
+## Design note: the zone crosswalk is treated as static
+
+The taxi zone lookup is fetched once (the DAG's `fetch_zone_lookup`
+task skips the download if the file already exists) and never
+refreshed. This is a deliberate stability-vs-freshness trade-off: the
+265-zone crosswalk is a quasi-static dimension, unchanged in practice
+since 2016, and never re-downloading keeps builds reproducible with no
+extra external failure mode per run. If the source did change, impact
+is contained — marts use a LEFT JOIN with `coalesce(..., 'Unknown')`,
+so unmatched zone IDs surface visibly as "Unknown" rather than
+dropping rows. For a faster-changing dimension I would refresh via
+HTTP conditional GET (`curl -z`, re-download only if modified) or
+track history with dbt snapshots (slowly changing dimensions, type 2).
+
 ## Possible extensions
 
 - Schedule the Airflow DAG on a server or swap in GitHub Actions for a

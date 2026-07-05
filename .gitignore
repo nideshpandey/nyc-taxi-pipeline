@@ -7,3 +7,6 @@ __pycache__/
 .venv-airflow/
 .airflow/
 .DS_Store
+data/
+dbt/nyc_taxi/.user.yml
+dbt/nyc_taxi/logs/

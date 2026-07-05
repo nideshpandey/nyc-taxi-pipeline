@@ -63,6 +63,18 @@ with DAG(
         cwd=PROJECT_DIR,
     )
 
+    # Idempotent: download the zone crosswalk only if it's not already there
+    # (INSTRUCTIONS.md step 3 — now automated so the DAG is self-sufficient).
+    fetch_zone_lookup = BashOperator(
+        task_id="fetch_zone_lookup",
+        bash_command=(
+            "test -s dbt/nyc_taxi/seeds/taxi_zone_lookup.csv || "
+            "curl -fsSL -o dbt/nyc_taxi/seeds/taxi_zone_lookup.csv "
+            "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+        ),
+        cwd=PROJECT_DIR,
+    )
+
     dbt_run = BashOperator(
         task_id="dbt_run",
         bash_command=DBT.format(cmd="run"),
@@ -81,4 +93,4 @@ with DAG(
         cwd=PROJECT_DIR,
     )
 
-    ingest >> load >> dbt_seed >> dbt_run >> dbt_test >> dbt_docs
+    ingest >> load >> fetch_zone_lookup >> dbt_seed >> dbt_run >> dbt_test >> dbt_docs
