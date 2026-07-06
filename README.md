@@ -49,6 +49,17 @@ re-run safely and cheaply:
    `fct_trip_summary` uses `delete+insert` on `pickup_date` with a 7-day
    lookback window to handle late-arriving or revised data.
 
+## Tested scale & disk space
+
+This pipeline has been tested end-to-end with 12 months of yellow taxi
+data (~40M rows). Note on disk usage: the staging build is a heavy
+operation — deduplicating on the hashed `trip_id` across the full
+dataset — and on a full refresh DuckDB may spill intermediate state to
+a temporary directory (`nyc_taxi.duckdb.tmp`). Plan for roughly **10 GB
+of free disk** during a full rebuild; the space is released
+automatically when the run completes. Routine incremental runs process
+one month at a time and stay far below this.
+
 ## Quickstart
 
 Recommended setup uses [uv](https://docs.astral.sh/uv/) (fast Python
