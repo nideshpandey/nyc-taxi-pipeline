@@ -25,7 +25,8 @@ cleaned as (
     select
         md5(concat_ws('|',
             source_file, tpep_pickup_datetime, tpep_dropoff_datetime,
-            PULocationID, DOLocationID, total_amount
+            PULocationID, DOLocationID, total_amount,
+            passenger_count, trip_distance, tip_amount
         ))                                   as trip_id,
         source_file,
         tpep_pickup_datetime                  as pickup_at,
@@ -52,4 +53,8 @@ cleaned as (
 
 )
 
-select * from cleaned
+-- Exact duplicate records exist in the raw TLC files; keep one copy per
+-- trip_id. DISTINCT ON uses hash aggregation instead of the global sort
+-- a row_number() window would need — far less memory/spill on full
+-- refreshes, where all months flow through in a single query.
+select distinct on (trip_id) * from cleaned
