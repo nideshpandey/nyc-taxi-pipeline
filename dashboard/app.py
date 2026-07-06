@@ -84,7 +84,7 @@ zf = zones[
     & zones.borough.isin(sel_boroughs)
 ]
 
-st.title("🚕 NYC Yellow Taxi Analytics")
+st.title("NYC Yellow Taxi Analytics")
 st.caption(f"{start} → {end} · {len(sel_boroughs)}/{len(boroughs)} boroughs · "
            f"{len(sel_payments)}/{len(payments)} payment types · "
            f"{hour_lo:02d}:00–{hour_hi:02d}:59")
@@ -101,9 +101,17 @@ tip_pct = float(f.tip_sum.sum()) / float(f.fare_sum.sum())
 avg_dist = float(f.distance_sum.sum()) / trips
 avg_dur = float(f.duration_sum.sum()) / trips
 
+def compact(n: float, prefix: str = "") -> str:
+    """33_891_042 -> '33.9M', 1_013_450_000 -> '$1.01B' (with prefix)."""
+    for div, suffix in ((1e9, "B"), (1e6, "M"), (1e3, "K")):
+        if abs(n) >= div:
+            return f"{prefix}{n / div:.2f}{suffix}"
+    return f"{prefix}{n:,.0f}"
+
+
 k1, k2, k3, k4, k5, k6 = st.columns(6)
-k1.metric("Trips", f"{trips:,}")
-k2.metric("Revenue", f"${revenue:,.0f}")
+k1.metric("Trips", compact(trips), help=f"{trips:,}")
+k2.metric("Revenue", compact(revenue, "$"), help=f"${revenue:,.0f}")
 k3.metric("Avg fare", f"${avg_fare:.2f}")
 k4.metric("Avg tip", f"{tip_pct:.1%}")
 k5.metric("Avg distance", f"{avg_dist:.1f} mi")
