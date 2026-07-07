@@ -16,7 +16,10 @@ import duckdb
 import pandas as pd
 import streamlit as st
 
-DB_PATH = Path(__file__).resolve().parents[1] / "data" / "warehouse" / "nyc_taxi.duckdb"
+_ROOT = Path(__file__).resolve().parents[1]
+_FULL = _ROOT / "data" / "warehouse" / "nyc_taxi.duckdb"
+_DEPLOY = Path(__file__).resolve().parent / "deploy.duckdb"
+DB_PATH = _FULL if _FULL.exists() else _DEPLOY
 MARTS_SCHEMA = "main_marts"  # check with: SHOW ALL TABLES (see INSTRUCTIONS.md step 6)
 
 WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
